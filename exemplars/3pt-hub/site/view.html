@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hub-workspace · Viewer</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./hub.css">
+<script src="./hub-data.js"></script>
+<script src="./diagram.js"></script>
+<script src="./view-render.js"></script>
+<style>
+  .doc{max-width:82ch;margin:0 auto;padding:26px 22px 90px}
+  .crumb{font:11px/1.4 var(--mono);color:var(--faint);display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+  .crumb .p{color:var(--cyan);word-break:break-all}
+  .crumb button{font-size:10px;padding:3px 9px}
+  .doc h1{font-size:1.9em;margin:.2em 0 .4em} .doc h2{font-size:1.35em;margin:1.6em 0 .5em;display:block} .doc h3{font-size:1.08em}
+  .doc p,.doc li{line-height:1.62}
+  .doc pre{background:var(--sand);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto}
+  .doc pre code{background:none;padding:0}
+  .doc pre.banner{font-size:.82em;color:var(--soft);white-space:pre-wrap}
+  .doc blockquote{border-left:3px solid var(--violet);margin:1em 0;padding:2px 0 2px 14px;color:var(--soft)}
+  .doc .tbl-wrap{margin:1em 0}
+  .doc hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+  .doc .cnt{font:11px var(--mono);color:var(--faint)}
+  .doc figure.diagram{margin:1.2em 0;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+  .doc figure.diagram svg{display:block;max-width:100%;height:auto}
+  .doc figure.diagram figcaption{font:10.5px/1.4 var(--mono);color:var(--faint);margin-top:8px}
+  .doc pre.diagram-error{border-color:var(--alert)}
+  .doc ul.tasks{list-style:none;padding-left:4px} .doc ul.tasks .box{font-family:var(--mono);margin-right:4px} .doc li.done{color:var(--faint);text-decoration:line-through}
+  .doc .seg{display:inline-block;font:700 10px/1 var(--mono);letter-spacing:.08em;color:var(--flag);border:1px solid color-mix(in srgb,var(--flag) 45%,transparent);border-radius:99px;padding:4px 9px;margin:18px 0 2px;text-decoration:none;scroll-margin-top:16px}
+  .doc .seg:target{background:color-mix(in srgb,var(--flag) 18%,transparent)}
+  .doc details{margin:4px 0}.doc summary{cursor:pointer;font:600 12.5px var(--sans)}
+  .warn{border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 9%,transparent);padding:12px 15px;border-radius:0 6px 6px 0;line-height:1.6}
+  @media print{.crumb{display:none}}
+</style>
+</head>
+<body>
+<script src="./nav.js"></script>
+<div class="doc">
+  <div class="crumb"><span class="p" id="path"></span><button id="copy">copy path</button><span id="kind"></span><a id="raw" href="#" style="display:none">open raw ↗</a></div>
+  <div id="out"></div>
+</div>
+<script>
+(function(){
+  var V = window.TPTVIEW;
+  var f = new URLSearchParams(location.search).get('f') || '';
+  var out = document.getElementById('out');
+  document.getElementById('path').textContent = f || '(no ?f= given)';
+  document.title = 'hub-workspace · ' + (f.split('/').pop() || 'Viewer');
+  document.getElementById('copy').onclick = function(e){ navigator.clipboard.writeText(f); e.target.textContent='copied ✓'; setTimeout(function(){ e.target.textContent='copy path'; },1200); };
+  if (!f) { out.innerHTML = '<div class="warn">No document requested. Add <code>?f=path</code>.</div>'; return; }
+  if (/^[a-z]+:/i.test(f) || f.indexOf('..')>=0 || f.charAt(0)==='/') { out.innerHTML = '<div class="warn">The Viewer reads paths inside this workspace only.</div>'; return; }
+  var kind = V.resolve(f);
+  document.getElementById('kind').textContent = '· ' + kind;
+  var raw = document.getElementById('raw'); raw.href = './' + f; raw.style.display = '';
+  fetch('./' + f).then(function(r){ if (!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.text(); }).then(function(text){
+    out.innerHTML = kind==='markdown' ? V.md(text, f.slice(0, f.lastIndexOf('/')+1)) : kind==='csv' ? V.csv(text) : kind==='json' ? V.json(text) : kind==='jsonl' ? V.jsonl(text) : '<pre><code>'+V.esc(text)+'</code></pre>';
+    var h1 = out.querySelector('h1'); if (h1) document.title = 'hub-workspace · ' + h1.textContent;
+    if (location.hash) { var tgt = document.getElementById(location.hash.slice(1)); if (tgt) tgt.scrollIntoView({ block:'start' }); }  /* the document arrives after load, so honour #sN.NN here */
+  }).catch(function(err){
+    out.innerHTML = '<div class="warn"><b>Cannot read this file from here.</b><br>Opening the workspace from <code>file://</code> blocks <code>fetch()</code>, so the Viewer needs it served:<br><br><code>make -C hub preview</code> &nbsp;then open <code>http://127.0.0.1:8000/</code><br><br>The path is above with a copy button. <span style="opacity:.7">('+V.esc(err.message)+')</span></div>';
+  });
+})();
+</script>
+</body>
+</html>

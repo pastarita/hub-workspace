@@ -1,0 +1,91 @@
+# 3PT · hub workspace CI/CD (Cloudflare Pages). Scoped to hub/ and the docs it renders.
+#
+# push to main  → stage + lints → production deploy  (https://3pt.pages.dev, gated)
+# pull request  → stage + lints → preview deploy at https://<branch>.3pt.pages.dev
+#                 + one sticky PR comment with the URL, so the other principal reviews in the browser.
+#
+# Deploy steps no-op with a notice until the two repository secrets exist:
+#   gh secret set CLOUDFLARE_API_TOKEN   (token scope: Cloudflare Pages: Edit)
+#   gh secret set CLOUDFLARE_ACCOUNT_ID  (from `npx wrangler whoami`)
+# wrangler runs from hub/ so hub/functions/_middleware.js (the gate) is compiled.
+name: Deploy hub to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['hub/**', 'docs/**', 'README.md', 'brainstorming.md', '.github/workflows/deploy.yml']
+  pull_request:
+    paths: ['hub/**', 'docs/**', 'README.md', 'brainstorming.md', '.github/workflows/deploy.yml']
+  workflow_dispatch: {}
+
+concurrency:
+  group: pages-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
+defaults:
+  run:
+    working-directory: hub
+
+jobs:
+  check:
+    name: Stage + lints
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: bash tools/stage.sh
+      - run: node tools/check-nav.mjs
+      - run: node tools/check-view.mjs
+      - run: node ../scripts/prov.mjs --check
+      - run: node tools/tersity.mjs --check
+
+  deploy:
+    name: Deploy
+    needs: check
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tools/stage.sh
+      - name: Check deploy credentials
+        id: creds
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CF_TOKEN" ] && [ -n "$CF_ACCOUNT" ]; then echo "ok=true" >> "$GITHUB_OUTPUT";
+          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::notice::Cloudflare secrets not set — deploy skipped (deploy by hand: make -C hub deploy)"; fi
+      - name: Deploy to Pages
+        id: deploy
+        if: steps.creds.outputs.ok == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: hub
+          # PRs deploy to a preview URL; main deploys production. One expression, both environments.
+          command: pages deploy _site --project-name=3pt --branch=${{ github.head_ref || 'main' }}
+      - name: Comment preview on PR
+        if: steps.creds.outputs.ok == 'true' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.deployment-url }}
+          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+        with:
+          script: |
+            const marker = '<!-- 3pt-preview -->';
+            const body = [marker, '## 3PT hub preview', '', '| | |', '|---|---|',
+              `| Preview | ${process.env.DEPLOY_URL} |`,
+              `| Branch alias | ${process.env.ALIAS_URL || '—'} |`,
+              `| Commit | \`${context.payload.pull_request.head.sha.slice(0, 7)}\` |`, '',
+              '_Gated at the edge — sign in with your allowlisted address and the team password._'].join('\n');
+            const { data: comments } = await github.rest.issues.listComments({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, per_page: 100 });
+            const existing = comments.find(c => c.body && c.body.startsWith(marker));
+            if (existing) await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            else await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });

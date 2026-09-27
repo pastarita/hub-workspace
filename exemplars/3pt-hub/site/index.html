@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hub-workspace · Hub</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./hub.css">
+<script src="./hub-data.js"></script>
+<style>
+  .grp-blurb{font:italic 13px/1.4 var(--serif);color:var(--soft);margin:-4px 0 12px}
+  .banner{display:block;width:100%;max-width:1100px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;margin:14px 0 6px}
+</style>
+</head>
+<body>
+<script src="./nav.js"></script>
+<div class="page">
+  <header class="top">
+    <p class="eyebrow">Hub · the exemplar instance of the hub-workspace skill</p>
+    <h1>hub-workspace</h1>
+    <p class="lede">This site is the pattern applied to itself: the skill's own documents, rendered through its Viewer, inside its Shell, with its diagram reader drawing the mermaid in them. Every file you see here is one of the files in the repository.</p>
+    <img class="banner" src="./assets/banner.svg" alt="hub-workspace: hub, shell, model, viewer, diagrams, gate, rails, lints, and the three moves">
+  </header>
+
+  <div class="stats" id="stats"></div>
+  <p style="margin:6px 0 0;font-size:12px;color:var(--faint)"><span class="pv d">DERIVED</span> tallies computed from <code>hub-data.js</code> at load. Nothing on this page is typed in.</p>
+
+  <h2 data-cluster="orient">Orient <span>what this is and the contract</span></h2>
+  <p class="grp-blurb" id="b-orient"></p>
+  <div class="cards" data-cluster="orient">
+    <a class="card" href="./view.html?f=README.md"><svg id="g-readme"></svg><i class="id">R0</i><b>README</b><span>Install as a global skill or vendor it into one repo; what is in here; the license.</span><em>read →</em><i class="temp">warm</i></a>
+    <a class="card" href="./view.html?f=SKILL.md"><svg id="g-skill"></svg><i class="id">S0</i><b>SKILL.md</b><span>The contract: vocabulary, the three moves, design-system discipline, provenance, the gate, re-entry surfaces, anti-patterns.</span><em>read →</em><i class="temp">hot</i></a>
+  </div>
+
+  <h2 data-cluster="reference">Reference <span>runbooks and templates the contract points to</span></h2>
+  <p class="grp-blurb" id="b-reference"></p>
+  <div class="cards" data-cluster="reference">
+    <a class="card" href="./view.html?f=references/templates.md"><svg id="g-templates"></svg><i class="id">T1</i><b>Templates</b><span>Scaffold checklist and copy-paste skeletons: leaf, Shell, gate, CI, re-entry set, provenance badge.</span><em>copy →</em><i class="temp">warm</i></a>
+    <a class="card" href="./view.html?f=references/access-runbook.md"><svg id="g-access"></svg><i class="id">T2</i><b>Access runbook</b><span>Cloudflare Access first and One-time PIN always: the exact dashboard click path, the AUD from the redirect, verification, the failure table.</span><em>follow →</em><i class="temp">hot</i></a>
+    <a class="card" href="./view.html?f=references/collaborator-access.md"><svg id="g-collaborators"></svg><i class="id">T3</i><b>Collaborator access</b><span>The three gate tiers, when to graduate, and the eleven rules that make a self-service door safe.</span><em>read →</em><i class="temp">warm</i></a>
+    <a class="card" href="./view.html?f=references/polyglot-viewer.md"><svg id="g-viewer-ref"></svg><i class="id">T4</i><b>Polyglot viewer</b><span>One Viewer for markdown, CSV, JSON and JSONL, and the three bugs its first drafts shipped.</span><em>read →</em><i class="temp">warm</i></a>
+    <a class="card" href="./view.html?f=references/derived-layer.md"><svg id="g-derived"></svg><i class="id">T5</i><b>Derived layer</b><span>Authored model, generated derived file, a generator and a verifier that recomputes from source.</span><em>read →</em><i class="temp">warm</i></a>
+    <a class="card" href="./view.html?f=references/symbolic-system.md"><svg id="g-symbols"></svg><i class="id">T6</i><b>Symbolic system</b><span>Register, cluster registry, glyph minting, status glyphs, stable handles, version control as navigation.</span><em>read →</em><i class="temp">warm</i></a>
+    <a class="card" href="./view.html?f=references/estate.md"><svg id="g-estate"></svg><i class="id">T7</i><b>Estate</b><span>The tier above one hub: federated peers stitched by a strip, or layer-major directories joined by slug.</span><em>read →</em><i class="temp">cold</i></a>
+  </div>
+
+  <h2 data-cluster="demo">Demo <span>the Viewer and the diagram reader on real input</span></h2>
+  <p class="grp-blurb" id="b-demo"></p>
+  <div class="cards" data-cluster="demo">
+    <a class="card" href="./view.html?f=docs/diagrams.md"><svg id="g-diagrams"></svg><i class="id">D1</i><b>Diagram reader</b><span>Flowchart with subgraphs and every edge style, a serpentine chain, a sequence diagram, a git graph, a state diagram, a class diagram: all rendered live from mermaid fences, no dependency.</span><em>see →</em><i class="temp">hot</i></a>
+    <a class="card" href="./view.html?f=docs/viewer.md"><svg id="g-viewer-demo"></svg><i class="id">D2</i><b>Viewer</b><span>Tables, task lists, fenced code, hard-wrapped prose, and links that resolve inside the Shell.</span><em>see →</em><i class="temp">warm</i></a>
+  </div>
+
+  <h2 data-cluster="record">Record <span>dated audits of real builds</span></h2>
+  <p class="grp-blurb" id="b-record"></p>
+  <div class="cards" data-cluster="record">
+    <a class="card" href="./view.html?f=reviews/2026-09-02-first-build.md"><svg id="g-review"></svg><i class="id">V1</i><b>Build review 2026-09-02</b><span>A day-zero-to-production build from the skill: the defects it found in the skill itself, and what was corrected.</span><em>read →</em><i class="temp">cold</i></a>
+  </div>
+
+  <footer>
+    <hr class="rule">
+    <p class="wordmark">hub-workspace</p>
+    <p class="sig">Write the leaf. Register it. Card the hub. Never a fourth move.</p>
+    <p class="contact">MIT · Patrick Astarita · <a href="https://github.com/pastarita/hub-workspace">github.com/pastarita/hub-workspace</a></p>
+  </footer>
+</div>
+<script>
+(function(){
+  var N = window.TPTNAV, T = window.T;
+  document.querySelectorAll('svg[id^="g-"]').forEach(function(el){ var slug = el.id.slice(2), src = N.GLYPH[slug]; if (src) el.outerHTML = src.replace('<svg', '<svg class="card-glyph"'); });
+  Object.keys(T.CLUSTERS).forEach(function(k){ var b=document.getElementById('b-'+k); if(b) b.textContent = T.CLUSTERS[k].blurb; });
+  var refs = T.DOCS.filter(function(d){ return d.cluster==='reference'; }).length;
+  var entries = N.GROUPS.reduce(function(a,g){ return a + g[1].length; }, 0) - 1;
+  var tiles = [[T.DOCS.length, 'documents in the Register'], [refs, 'reference runbooks'], [entries, 'sidebar entries, one registry'], [Object.keys(N.GLYPH).length, 'glyphs minted']];
+  document.getElementById('stats').innerHTML = tiles.map(function(t){ return '<div class="stat"><div class="n">'+t[0]+'</div><div class="l">'+t[1]+'</div></div>'; }).join('');
+})();
+</script>
+</body>
+</html>
