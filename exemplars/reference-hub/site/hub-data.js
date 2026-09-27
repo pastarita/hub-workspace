@@ -1,21 +1,21 @@
 /* hub-workspace exemplar · the Model — AUTHORED. One shared data layer every leaf reads.
    This instance renders the skill's own documents, so the Register is the skill's file list.
-   Node-safe: defines globalThis.T and does no DOM work. Hot-leaf state prefix: `hw_`. */
+   Node-safe: defines globalThis.W and does no DOM work. Hot-leaf state prefix: `hw_`. */
 (function(){
-  var T = {};
-  T.NS = 'hw_';
-  T.PROGRAM = { name:'hub-workspace', long:'hub-workspace · the exemplar', repo:'https://github.com/pastarita/hub-workspace' };
+  var W = {};
+  W.NS = 'hw_';
+  W.PROGRAM = { name:'hub-workspace', long:'hub-workspace · the exemplar', repo:'https://github.com/pastarita/hub-workspace' };
 
   /* Cluster registry — phases of reading the pattern, never file types. */
-  T.CLUSTERS = {
-    orient:    { label:'Orient',    color:'var(--violet)', blurb:'What a hub workspace is and the contract every agent follows.' },
-    reference: { label:'Reference', color:'var(--cyan)',   blurb:'The runbooks and templates the contract points to.' },
-    demo:      { label:'Demo',      color:'var(--amber)',  blurb:'The Viewer and the diagram reader, exercised on real input.' },
-    record:    { label:'Record',    color:'var(--slate)',  blurb:'Dated audits of real builds against the pattern.' }
+  W.CLUSTERS = {
+    orient:    { label:'Orient',    color:'var(--c-orient)', blurb:'What a hub workspace is and the contract every agent follows.' },
+    reference: { label:'Reference', color:'var(--c-reference)', blurb:'The runbooks and templates the contract points to.' },
+    demo:      { label:'Demo',      color:'var(--c-demo)', blurb:'The Viewer and the diagram reader, exercised on real input.' },
+    record:    { label:'Record',    color:'var(--c-record)', blurb:'Dated audits of real builds against the pattern.' }
   };
 
   /* The Register — one record per document, read through view.html?f= */
-  T.DOCS = [
+  W.DOCS = [
     { id:'R0', slug:'readme',        name:'README',                 verb:'Entering',   cluster:'orient',    temp:'warm', doc:'README.md',                          epigram:'Install, layout, the exemplar, the license.' },
     { id:'S0', slug:'skill',         name:'SKILL.md',               verb:'Contracting',cluster:'orient',    temp:'hot',  doc:'SKILL.md',                           epigram:'Vocabulary, the three moves, design discipline, provenance, the gate, re-entry, anti-patterns.' },
     { id:'T1', slug:'templates',     name:'Templates',              verb:'Copying',    cluster:'reference', temp:'warm', doc:'references/templates.md',            epigram:'Scaffold checklist and skeletons: leaf, Shell, gate, CI, re-entry set, provenance badge.' },
@@ -30,9 +30,9 @@
     { id:'V1', slug:'review',        name:'Build review 2026-09-02',verb:'Auditing',   cluster:'record',    temp:'cold', doc:'reviews/2026-09-02-first-build.md',  epigram:'A first build from the skill, and the defects it found in the skill.' }
   ];
 
-  T.doc = function(id){ for (var i=0;i<T.DOCS.length;i++) if (T.DOCS[i].id===id||T.DOCS[i].slug===id) return T.DOCS[i]; return null; };
-  T.load = function(key, fallback){ try{ var v=localStorage.getItem(T.NS+key); return v?JSON.parse(v):fallback; }catch(e){ return fallback; } };
-  T.save = function(key, val){ try{ localStorage.setItem(T.NS+key, JSON.stringify(val)); }catch(e){} };
-  T.esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
-  (typeof globalThis!=='undefined'?globalThis:window).T = T;
+  W.doc = function(id){ for (var i=0;i<W.DOCS.length;i++) if (W.DOCS[i].id===id||W.DOCS[i].slug===id) return W.DOCS[i]; return null; };
+  W.load = function(key, fallback){ try{ var v=localStorage.getItem(W.NS+key); return v?JSON.parse(v):fallback; }catch(e){ return fallback; } };
+  W.save = function(key, val){ try{ localStorage.setItem(W.NS+key, JSON.stringify(val)); }catch(e){} };
+  W.esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  (typeof globalThis!=='undefined'?globalThis:window).W = W;
 })();

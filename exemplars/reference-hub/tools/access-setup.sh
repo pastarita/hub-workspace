@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# 3PT · Tier 1: put Cloudflare Access (Zero Trust) in front of the hub, over the API.
+# hub-workspace reference · Tier 1: put Cloudflare Access (Zero Trust) in front of the hub, over the API.
 #
-# Creates one self-hosted Access application covering 3pt.pages.dev AND *.3pt.pages.dev (so PR
+# Creates one self-hosted Access application covering <project>.pages.dev AND *.<project>.pages.dev (so PR
 # previews are gated by the same app and AUD), with one Allow policy for the principals, then
 # writes ACCESS_TEAM_DOMAIN + ACCESS_AUD into the Pages project (Production and Preview) so
 # functions/_middleware.js can verify the assertion. Idempotent: re-running updates the same app.
@@ -11,18 +11,18 @@
 #   Permissions (Account):  Access: Apps and Policies · Edit
 #                           Access: Organizations, Identity Providers, and Groups · Read
 #   Account resources:      Include · <your account>
-# and save it to ~/.config/3pt/CF_API_TOKEN (chmod 600). Never commit it.
+# and save it to ~/.config/hub-workspace/CF_API_TOKEN (chmod 600). Never commit it.
 #
 # Usage:  CF_ACCOUNT_ID=<id> ACCESS_DOMAIN=example.com \
 #         ACCESS_EMAILS="you@example.com,collaborator@gmail.com" tools/access-setup.sh
 set -euo pipefail
 ACCOUNT="${CF_ACCOUNT_ID:?set CF_ACCOUNT_ID (wrangler whoami prints it)}"
-PROJECT="${PAGES_PROJECT:-3pt}"
-APP_NAME="${ACCESS_APP_NAME:-3PT hub}"
+PROJECT="${PAGES_PROJECT:-hub-workspace}"
+APP_NAME="${ACCESS_APP_NAME:-Hub workspace}"
 EMAILS="${ACCESS_EMAILS:?set ACCESS_EMAILS to the principals' login addresses, comma-separated}"
 DOMAIN="${ACCESS_DOMAIN:-}"
-TOKEN="${CF_API_TOKEN:-$(cat ~/.config/3pt/CF_API_TOKEN 2>/dev/null || true)}"
-[ -n "$TOKEN" ] || { echo "FAIL: no API token. Put one in ~/.config/3pt/CF_API_TOKEN (see header)." >&2; exit 1; }
+TOKEN="${CF_API_TOKEN:-$(cat ~/.config/hub-workspace/CF_API_TOKEN 2>/dev/null || true)}"
+[ -n "$TOKEN" ] || { echo "FAIL: no API token. Put one in ~/.config/hub-workspace/CF_API_TOKEN (see header)." >&2; exit 1; }
 command -v jq >/dev/null || { echo "FAIL: jq is required (brew install jq)" >&2; exit 1; }
 API="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT"
 cf() { curl -sS -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" "$@"; }
@@ -40,7 +40,7 @@ BODY="$(jq -n --arg name "$APP_NAME" --arg dom "$PROJECT.pages.dev" --arg wild "
   name: $name, type: "self_hosted", domain: $dom, self_hosted_domains: [$dom, $wild],
   session_duration: "24h", app_launcher_visible: true, auto_redirect_to_identity: false,
   http_only_cookie_attribute: true, same_site_cookie_attribute: "lax",
-  policies: [{ name: "3PT principals", decision: "allow", precedence: 1, include: $inc }]
+  policies: [{ name: "Principals", decision: "allow", precedence: 1, include: $inc }]
 }')"
 
 # 3. create or update the app (idempotent on name)

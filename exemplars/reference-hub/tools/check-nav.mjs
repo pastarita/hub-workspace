@@ -1,13 +1,13 @@
 // check-nav.mjs — the Register's consistency checker. Run from hub/: tools/stage.sh && node tools/check-nav.mjs
 // The type-check for the IA. Runs against the STAGED artifact (hub/_site/) — what actually ships.
 // Validates nav.js (single source of IA) + hub-data.js against disk:
-//   1. slugs unique; every sidebar entry has a minted glyph; ids unique and match T.DOCS
-//   2. every cluster key in GROUPS exists in nav CLUSTERS AND in T.CLUSTERS (one namespace)
+//   1. slugs unique; every sidebar entry has a minted glyph; ids unique and match W.DOCS
+//   2. every cluster key in GROUPS exists in nav CLUSTERS AND in W.CLUSTERS (one namespace)
 //   3. the EMITTED href (from the real href() in nav.js) resolves literally on disk,
 //      ends in .html (or routes through view.html?f=<existing file>)
 //   4. nav.js never derives hrefs from the page's own URL (bans the bug CLASS)
 //   5. every HTML leaf includes the shell and the tokens, has no external deps, and is reachable
-//   6. no href points at a raw .md/.csv (documents route via the Viewer); T.DOCS docs exist
+//   6. no href points at a raw .md/.csv (documents route via the Viewer); W.DOCS docs exist
 //   7. the hub cards every sidebar slug except the Viewer; no literal counts in stat tiles
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
@@ -18,11 +18,11 @@ const ROOT = join(REPO, '_site');
 if (!existsSync(ROOT)) { console.error('FAIL: _site/ missing — run tools/stage.sh first'); process.exit(1); }
 await import(join(ROOT, 'hub-data.js'));
 await import(join(ROOT, 'nav.js'));
-const T = globalThis.T, N = globalThis.TPTNAV;
+const W = globalThis.W, N = globalThis.HUBNAV;
 const errs = [], warns = [];
 const bad = m => errs.push(m);
-if (!T) bad('hub-data.js did not define globalThis.T');
-if (!N) bad('nav.js did not define globalThis.TPTNAV');
+if (!W) bad('hub-data.js did not define globalThis.W');
+if (!N) bad('nav.js did not define globalThis.HUBNAV');
 if (errs.length) { errs.forEach(e => console.error('FAIL:', e)); process.exit(1); }
 
 const SHELL_EXEMPT = [];           // declared shell-less leaves (none yet)
@@ -34,15 +34,15 @@ if (/location\.(protocol|host|hostname)/.test(navSrc)) bad('nav.js derives hrefs
 
 // 1–3, 6
 const slugs = new Set(), ids = new Set();
-const docIds = new Set(T.DOCS.map(d => d.id));
+const docIds = new Set(W.DOCS.map(d => d.id));
 for (const [cluster, entries] of N.GROUPS) {
   if (cluster && !N.CLUSTERS[cluster]) bad(`GROUPS cluster "${cluster}" missing from nav CLUSTERS`);
-  if (cluster && !T.CLUSTERS[cluster]) bad(`GROUPS cluster "${cluster}" missing from T.CLUSTERS — two namespaces`);
+  if (cluster && !W.CLUSTERS[cluster]) bad(`GROUPS cluster "${cluster}" missing from W.CLUSTERS — two namespaces`);
   for (const [slug, label, id] of entries) {
     if (slugs.has(slug)) bad(`duplicate slug ${slug}`); slugs.add(slug);
     if (!N.GLYPH[slug]) bad(`${slug}: sidebar entry with no glyph`);
     if (!label) bad(`${slug}: no label`);
-    if (id) { if (ids.has(id)) bad(`duplicate id ${id}`); ids.add(id); if (!docIds.has(id)) bad(`${slug}: id ${id} not in T.DOCS`); }
+    if (id) { if (ids.has(id)) bad(`duplicate id ${id}`); ids.add(id); if (!docIds.has(id)) bad(`${slug}: id ${id} not in W.DOCS`); }
     const emitted = N.href(slug);
     if (!emitted.startsWith('./')) bad(`${slug}: href not relative: ${emitted}`);
     const [pathPart, query] = emitted.replace(/^\.\//, '').split('?');
@@ -56,11 +56,11 @@ for (const [cluster, entries] of N.GROUPS) {
     }
   }
 }
-for (const k of Object.keys(N.CLUSTERS)) if (!T.CLUSTERS[k]) bad(`nav CLUSTERS has "${k}" but T.CLUSTERS does not`);
-for (const k of Object.keys(T.CLUSTERS)) if (!N.CLUSTERS[k]) bad(`T.CLUSTERS has "${k}" but nav CLUSTERS does not`);
-for (const d of T.DOCS) {
+for (const k of Object.keys(N.CLUSTERS)) if (!W.CLUSTERS[k]) bad(`nav CLUSTERS has "${k}" but W.CLUSTERS does not`);
+for (const k of Object.keys(W.CLUSTERS)) if (!N.CLUSTERS[k]) bad(`W.CLUSTERS has "${k}" but nav CLUSTERS does not`);
+for (const d of W.DOCS) {
   if (!existsSync(join(ROOT, d.doc))) bad(`${d.id}: doc missing in _site: ${d.doc}`);
-  if (!T.CLUSTERS[d.cluster]) bad(`${d.id}: unknown cluster ${d.cluster}`);
+  if (!W.CLUSTERS[d.cluster]) bad(`${d.id}: unknown cluster ${d.cluster}`);
   if (!slugs.has(d.slug)) warns.push(`${d.id} (${d.slug}) is in the Register but not in the sidebar`);
 }
 for (const k of Object.keys(N.FRESH)) if (!slugs.has(k)) bad(`FRESH marks unknown slug ${k}`);
@@ -110,4 +110,4 @@ for (const m of hub.matchAll(/class="n"[^>]*>\s*(\d+)\s*</g)) bad(`index.html: l
 
 for (const w of warns) console.log('warn:', w);
 if (errs.length) { for (const e of errs) console.error('FAIL:', e); process.exit(1); }
-console.log(`OK — ${slugs.size} sidebar entries, ${T.DOCS.length} documents in the Register, ${leaves.length} HTML leaves, ${Object.keys(N.CLUSTERS).length} clusters, 0 errors`);
+console.log(`OK — ${slugs.size} sidebar entries, ${W.DOCS.length} documents in the Register, ${leaves.length} HTML leaves, ${Object.keys(N.CLUSTERS).length} clusters, 0 errors`);

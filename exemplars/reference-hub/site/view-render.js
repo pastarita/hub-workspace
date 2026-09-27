@@ -1,6 +1,6 @@
-/* 3PT · Viewer renderers (markdown subset + CSV + JSON/JSONL). Shared by view.html and
+/* hub-workspace reference · Viewer renderers (markdown subset + CSV + JSON/JSONL). Shared by view.html and
    tools/check-view.mjs so the regression checks run against the shipped code. Node-safe:
-   exports globalThis.TPTVIEW. The fence sentinel is built from String.fromCharCode(0) at runtime
+   exports globalThis.HUBVIEW. The fence sentinel is built from String.fromCharCode(0) at runtime
    so this source never carries a NUL byte (a literal NUL makes git treat the file as binary). */
 (function(){
   var esc = function(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); };
@@ -28,7 +28,7 @@
     src = src.replace(/```(\w*)\n([\s\S]*?)```/g, function(_, lang, body){
       /* ```mermaid → the hub's own reader (diagram.js), typeset in the tokens. A fence the reader
          cannot parse stays visible as source with the reason, never silently blank. */
-      var D = (typeof globalThis!=='undefined'?globalThis:window).TPTDIAGRAM;
+      var D = (typeof globalThis!=='undefined'?globalThis:window).HUBDIAGRAM;
       if (lang === 'mermaid' && D) {
         try { return TOK(fences.push('<figure class="diagram">'+D.render(body)+'</figure>') - 1); }
         catch (e) { return TOK(fences.push('<pre class="diagram-error"><code data-lang="mermaid">'+esc(body)+'</code></pre><p class="cnt">diagram not rendered: '+esc(e.message)+'</p>') - 1); }
@@ -143,5 +143,5 @@
   var KIND = { md:'markdown', markdown:'markdown', csv:'csv', json:'json', jsonl:'jsonl',
     js:'source', mjs:'source', css:'source', txt:'source', svg:'source', geojson:'json', py:'source', yml:'source', yaml:'source', sh:'source', jsonc:'source' };
   function resolve(f){ var ext = (f.split('.').pop()||'').toLowerCase(); return KIND[ext] || 'source'; }
-  (typeof globalThis!=='undefined'?globalThis:window).TPTVIEW = { md:md, csv:csv, json:json, jsonl:jsonl, resolve:resolve, esc:esc, rel:rel };
+  (typeof globalThis!=='undefined'?globalThis:window).HUBVIEW = { md:md, csv:csv, json:json, jsonl:jsonl, resolve:resolve, esc:esc, rel:rel };
 })();

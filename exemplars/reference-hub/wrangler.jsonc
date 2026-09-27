@@ -1,0 +1,10 @@
+{
+  // hub-workspace reference · Cloudflare Pages.
+  // The deploy artifact is _site/ = site/ + docs/ + the skill's own documents, built by
+  // tools/stage.sh so the Viewer can reach them. A real instance deploys from THIS directory so
+  // functions/ (the gate) is compiled; the public demo deploys from inside _site/, ungated.
+  //   make deploy   (= make check, then npx wrangler pages deploy . from _site/)
+  "name": "hub-workspace",
+  "compatibility_date": "2026-09-01",
+  "pages_build_output_dir": "_site"
+}

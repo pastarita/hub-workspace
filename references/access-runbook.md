@@ -36,7 +36,7 @@ a human can do it by hand in under ten minutes. Verified 2026-09-26 on a live hu
   a **read-only overview**; the edit form is the **Configure** link on that overview, or
   `policies/<id>/edit`.
 - The application **Name** field is at the bottom of the form under *Details* and is pre-filled
-  with the first hostname. Set it; "3pt.pages.dev" is not a name.
+  with the first hostname. Set it; "<project>.pages.dev" is not a name.
 
 ## The click path (self-hosted app + policy + PIN)
 
@@ -82,7 +82,7 @@ done
 make deploy      # secrets bind at deploy
 ```
 
-Middleware shape (the `exemplars/3pt-hub/functions/_middleware.js` is the exemplar): accept a verified
+Middleware shape (the `exemplars/reference-hub/functions/_middleware.js` is the exemplar): accept a verified
 `Cf-Access-Jwt-Assertion` header or `CF_Authorization` cookie — RS256 against
 `https://<team>/cdn-cgi/access/certs`, `kid` pinned, `iss` = `https://<team>`, `aud` contains
 `ACCESS_AUD`, `exp` in the future — else fall through to Basic auth, else 401. Keys unreachable →
@@ -114,7 +114,7 @@ in with a PIN before you call it done.** The owner's success proves nothing abou
 ## API alternative (when a token exists)
 
 A token with *Access: Apps and Policies · Edit* and *Access: Organizations, Identity Providers, and
-Groups · Read* lets `exemplars/3pt-hub/tools/access-setup.sh` create or update the same app idempotently,
+Groups · Read* lets `exemplars/reference-hub/tools/access-setup.sh` create or update the same app idempotently,
 including the wildcard destination and the inline policy, and write the two Pages secrets. Use it
 for the second hub onward; the dashboard path above is still the one to know, because it is what
 you debug with.

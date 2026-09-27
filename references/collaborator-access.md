@@ -250,4 +250,4 @@ up SSO", which is not a thing that exists.
 A complete build runs Tier 1 and Tier 2 side by side over one Cloudflare Pages project, with the mail hop through a separate email
 Worker, 68 adversarial assertions, and a setup runbook. Its layout is the shape
 shown in *Tier 2 — the shape*. The Tier 1 verifier alone ships in
-`exemplars/3pt-hub/functions/_middleware.js`.
+`exemplars/reference-hub/functions/_middleware.js`.

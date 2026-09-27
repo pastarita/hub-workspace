@@ -1,4 +1,4 @@
-/* 3PT · Gate — Tier 1 (Cloudflare Access) with the Tier 0 door kept beside it.
+/* hub-workspace reference · Gate — Tier 1 (Cloudflare Access) with the Tier 0 door kept beside it.
    Two doors, one room. A request is served if it carries EITHER proof:
      1. a Cloudflare Access assertion (Cf-Access-Jwt-Assertion header or CF_Authorization cookie)
         that VERIFIES — RS256 signature against the team's published keys, issuer, audience, expiry.
@@ -83,8 +83,8 @@ export async function onRequest(ctx) {
     }
   }
   if (basicOk(request, env)) return next();
-  return new Response('3PT workspace · sign in through Cloudflare Access, or with an allowlisted address and the team password.', {
+  return new Response('Workspace · sign in through Cloudflare Access, or with an allowlisted address and the team password.', {
     status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="3pt", charset="UTF-8"', 'Cache-Control': 'no-store' }
+    headers: { 'WWW-Authenticate': 'Basic realm="workspace", charset="UTF-8"', 'Cache-Control': 'no-store' }
   });
 }

@@ -26,7 +26,7 @@ Access app + `<Project> team` policy + One-time PIN provider, restricted to PIN*
 path is `references/access-runbook.md`, do it before writing a leaf · 3. read
 `ACCESS_TEAM_DOMAIN` + `ACCESS_AUD` from the app's redirect (`kid=`), `wrangler pages secret put`
 both in production *and* `--env preview`, plus `ACCESS_PASS` for the second door · 4. Gate that
-verifies the assertion (crib the `exemplars/3pt-hub/functions/_middleware.js`) · 5. hub + Shell + one
+verifies the assertion (crib the `exemplars/reference-hub/functions/_middleware.js`) · 5. hub + Shell + one
 leaf · 6. deploy from the dir containing `functions/` · 7. verify: anon 302 → team domain,
 forged header 302, preview 302 · 8. **the non-owner collaborator signs in with a PIN** · 9.
 Actions secrets → CI green · 10. AGENTS.md records all of it, including the team domain and
@@ -98,7 +98,7 @@ policy name.
    +"#hubnav .nv-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--flag,#e8703b);vertical-align:middle;margin-left:5px}"
    +"@media(max-width:900px){#hubnav{position:sticky;height:48px;width:auto;flex-direction:row;bottom:auto;align-items:center;overflow-x:auto}body{margin-left:0!important}"
    +"#hubnav a span,#hubnav .nv-grp,#hubnav .nv-min{display:none}#hubnav a.on{box-shadow:inset 0 -3px 0 currentColor}"
-   +"/* narrow = GLYPHS ONLY — full labels overflow the strip; the glyph set IS the compact nav. + hamburger: see exemplars/3pt-hub/site/nav.js */}"
+   +"/* narrow = GLYPHS ONLY — full labels overflow the strip; the glyph set IS the compact nav. + hamburger: see exemplars/reference-hub/site/nav.js */}"
    +"@media print{#hubnav{display:none!important}body{margin-left:0!important}}";
   function run(){
     var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
@@ -119,7 +119,7 @@ policy name.
 
 Full-featured reference (mobile hamburger, GROUPS, FRESH, PATH, viewer-routed sidebar
 entries via a `ROUTE` map, always-`.html` hrefs, node-safe export for lints):
-`exemplars/3pt-hub/site/nav.js`. **Do not crib a Shell that branches on
+`exemplars/reference-hub/site/nav.js`. **Do not crib a Shell that branches on
 `location.protocol`** — such a Shell 404s its own rail on every plain static server, and
 the hub cards keep working, so nobody notices (see *Link resolution* below).
 
@@ -175,7 +175,7 @@ That last assertion is the one that matters — it bans the *category*, not the 
 Pages-style extensionless resolution (`/foo` → `foo.html`, `/foo/` → `foo/index.html`)
 so a local preview is a faithful one and both link styles resolve while you migrate.
 Give its 404 the list of paths it tried — a bare "File not found" is what makes this
-bug cost an afternoon. Worked exemplar: `exemplars/3pt-hub/tools/serve.py`.
+bug cost an afternoon. Worked exemplar: `exemplars/reference-hub/tools/serve.py`.
 
 Two more hard-won Shell rules:
 
@@ -189,14 +189,14 @@ Two more hard-won Shell rules:
   sidebar entry has a glyph, every HTML leaf includes the shell or is declared shell-less,
   every leaf reachable (carded / lane-reached / declared), no raw `.md`/`.csv` hrefs. Run it
   after every Register change — it is the type-check for the IA. Worked exemplar:
-  `exemplars/3pt-hub/tools/check-nav.mjs`.
+  `exemplars/reference-hub/tools/check-nav.mjs`.
 
 ## Gate — functions/_middleware.js
 
 **Access fronts the hostnames; this file verifies the assertion Access attaches and keeps the
 Basic door beside it.** The full two-door verifier (RS256 against the team certs, pinned `kid`,
 `iss`/`aud`/`exp`, 503 on unreachable keys, no `DISABLE_GATE`) is
-`exemplars/3pt-hub/functions/_middleware.js` — copy it whole. The Basic-only
+`exemplars/reference-hub/functions/_middleware.js` — copy it whole. The Basic-only
 skeleton below is the *second door* on its own, kept for reference; it is not a day-zero gate
 any more.
 
@@ -260,8 +260,8 @@ curl -su 'x@elsewhere.com:PASS' -o /dev/null -w '%{http_code}\n' https://<projec
 
 ## The exemplar (read before building)
 
-Everything cited in this file as `exemplars/3pt-hub/…` ships in this repo and runs:
-`make -C exemplars/3pt-hub check preview`.
+Everything cited in this file as `exemplars/reference-hub/…` ships in this repo and runs:
+`make -C exemplars/reference-hub check preview`.
 
 | File | Study it for |
 |---|---|

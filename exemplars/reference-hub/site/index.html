@@ -9,7 +9,7 @@
 <script src="./hub-data.js"></script>
 <style>
   .grp-blurb{font:italic 13px/1.4 var(--serif);color:var(--soft);margin:-4px 0 12px}
-  .banner{display:block;width:100%;max-width:1100px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;margin:14px 0 6px}
+  .banner{display:block;width:100%;max-width:1100px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);margin:14px 0 6px}
 </style>
 </head>
 <body>
@@ -66,12 +66,12 @@
 </div>
 <script>
 (function(){
-  var N = window.TPTNAV, T = window.T;
+  var N = window.HUBNAV, W = window.W;
   document.querySelectorAll('svg[id^="g-"]').forEach(function(el){ var slug = el.id.slice(2), src = N.GLYPH[slug]; if (src) el.outerHTML = src.replace('<svg', '<svg class="card-glyph"'); });
-  Object.keys(T.CLUSTERS).forEach(function(k){ var b=document.getElementById('b-'+k); if(b) b.textContent = T.CLUSTERS[k].blurb; });
-  var refs = T.DOCS.filter(function(d){ return d.cluster==='reference'; }).length;
+  Object.keys(W.CLUSTERS).forEach(function(k){ var b=document.getElementById('b-'+k); if(b) b.textContent = W.CLUSTERS[k].blurb; });
+  var refs = W.DOCS.filter(function(d){ return d.cluster==='reference'; }).length;
   var entries = N.GROUPS.reduce(function(a,g){ return a + g[1].length; }, 0) - 1;
-  var tiles = [[T.DOCS.length, 'documents in the Register'], [refs, 'reference runbooks'], [entries, 'sidebar entries, one registry'], [Object.keys(N.GLYPH).length, 'glyphs minted']];
+  var tiles = [[W.DOCS.length, 'documents in the Register'], [refs, 'reference runbooks'], [entries, 'sidebar entries, one registry'], [Object.keys(N.GLYPH).length, 'glyphs minted']];
   document.getElementById('stats').innerHTML = tiles.map(function(t){ return '<div class="stat"><div class="n">'+t[0]+'</div><div class="l">'+t[1]+'</div></div>'; }).join('');
 })();
 </script>

@@ -69,4 +69,4 @@ stakeholder state machine and question ledger in one Model; node-safe Shell, Mod
 Viewer renderers; two `.mjs` lints wired into CI; Pages-style preview server; Tier 0 gate
 verified four ways; secret kept outside the tree. The smallest complete instance, and the
 worked case for the root-as-site caveat. Its reusable parts were folded into
-`exemplars/3pt-hub/`.
+`exemplars/reference-hub/`.

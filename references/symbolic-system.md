@@ -57,7 +57,7 @@ glyph  +  [ID · NAME]  +  [verb · cluster-label]  (+ optional status dot)
 
 In the estate hub's `buildNav()`: `<span class="n">${l.id}</span>${l.name}` over
 `${l.gerund} · ${domOf(l).label}`, with a layer hub adding a completeness dot (costed vs
-concept). The ID is chrome, not metadata. Public instance: `exemplars/3pt-hub/site/nav.js`
+concept). The ID is chrome, not metadata. Public instance: `exemplars/reference-hub/site/nav.js`
 renders `ID · NAME` rows from `site/hub-data.js`.
 
 ## Glyph minting rule
@@ -146,6 +146,6 @@ The git history is itself a navigable surface (record the grammar in an `SDLC.md
 
 | Path | Study it for |
 |---|---|
-| `exemplars/3pt-hub/site/hub-data.js` | A Register in keyed form (`id · slug · name · verb · cluster · temp · doc · epigram`) and the cluster registry it keys into |
-| `exemplars/3pt-hub/site/nav.js` | Sidebar rows rendered from the Register; glyphs minted to the rule above, recolored per cluster |
-| `exemplars/3pt-hub/tools/check-nav.mjs` | The Register lint: unique ids and slugs, one cluster namespace across Shell and Model, a glyph per entry |
+| `exemplars/reference-hub/site/hub-data.js` | A Register in keyed form (`id · slug · name · verb · cluster · temp · doc · epigram`) and the cluster registry it keys into |
+| `exemplars/reference-hub/site/nav.js` | Sidebar rows rendered from the Register; glyphs minted to the rule above, recolored per cluster |
+| `exemplars/reference-hub/tools/check-nav.mjs` | The Register lint: unique ids and slugs, one cluster namespace across Shell and Model, a glyph per entry |

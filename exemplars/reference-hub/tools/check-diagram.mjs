@@ -9,7 +9,7 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ROOT = join(REPO, '_site');
 if (!existsSync(ROOT)) { console.error('FAIL: _site/ missing — run tools/stage.sh first'); process.exit(1); }
 await import(join(ROOT, 'diagram.js'));
-const D = globalThis.TPTDIAGRAM;
+const D = globalThis.HUBDIAGRAM;
 const errs = [];
 const t = (name, cond, extra) => { if (!cond) errs.push(name + (extra ? ' — ' + extra : '')); };
 

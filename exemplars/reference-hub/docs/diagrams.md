@@ -2,7 +2,7 @@
 
 Every diagram on this page is a plain mermaid fence in the markdown. The Viewer hands each one to
 `site/diagram.js`, which reads the subset below and renders SVG in the site's tokens. There is no
-mermaid library on this page. Colour comes from the class *name* (`:::plan`), never from the hex
+mermaid library on this page. Colour comes from the class *name* (`:::hub`), never from the hex
 in `classDef`, so the tokens keep one source. Flow kind is line style, never colour alone.
 
 ## Flowchart with subgraphs, six shapes, five edge styles
@@ -12,25 +12,25 @@ flowchart LR
   subgraph IN["inputs · what arrives"]
     direction TB
     A[document]:::data
-    B[(records)]:::atlas
+    B[(records)]:::store
     C[/stream/]:::data
   end
-  subgraph H["the harness"]
+  subgraph H["the hub"]
     direction TB
-    P[plan]:::plan --> Bd[build]:::build --> I[instrument]:::inst
-    I ==>|backfeed| P
+    Sh[Shell]:::hub --> M[Model]:::model --> L[leaf]:::leaf
+    L ==>|state| M
   end
   subgraph OUT["outputs"]
     direction TB
     S([surface]):::surface
-    F{{flag}}:::flag
-    R((report)):::battery
+    F{{gate}}:::gate
+    R((print)):::rails
   end
   A & B & C --> H
   H --> S & F
-  I -.->|"metrics"| R
+  L -.->|"cold leaves"| R
   IN -.- OUT
-  classDef plan fill:#000
+  classDef hub fill:#000
 ```
 
 ## A long chain wraps serpentine

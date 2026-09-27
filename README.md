@@ -52,16 +52,16 @@ points to.
 | `references/symbolic-system.md` | Register, cluster registry, glyph minting, status glyphs, stable handles. |
 | `references/estate.md` | The tier above one hub: federated and layered estates. |
 | `reviews/` | Dated audits of real builds against the pattern. |
-| `exemplars/3pt-hub/` | A complete working instance, lifted from the 3PT hackathon hub: Shell, tokens, Viewer, the mermaid reader (`site/diagram.js`), the two-door gate (`functions/_middleware.js`), the lints, stage and preview scripts, the Access setup script, and the CI workflow. |
+| `exemplars/reference-hub/` | A complete working instance with its own paper-base design system: Shell, tokens, Viewer, the mermaid reader (`site/diagram.js`), the two-door gate (`functions/_middleware.js`), the lints, stage and preview scripts, the Access setup script, and the CI workflow. |
 
 ## About the exemplars
 
-The one exemplar that ships, `exemplars/3pt-hub/`, is cited by relative path. The other
+The one exemplar that ships, `exemplars/reference-hub/`, is cited by relative path. The other
 recipes are described in enough detail to build from.
 
 ## The mermaid reader
 
-`exemplars/3pt-hub/site/diagram.js` reads the mermaid subset a documentation set actually
+`exemplars/reference-hub/site/diagram.js` reads the mermaid subset a documentation set actually
 uses and renders SVG in the site's tokens, with no dependency: flowcharts in four directions
 with nested subgraphs, edges to and from a subgraph, six node shapes, five edge styles, fan-out,
 bidirectional edges, self-loops, serpentine wrapping for long chains; sequence diagrams with

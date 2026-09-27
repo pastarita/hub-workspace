@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""3PT · preview server — Cloudflare-Pages-style routing so a local preview is faithful.
+"""hub-workspace reference · preview server — Cloudflare-Pages-style routing so a local preview is faithful.
   /foo      -> foo.html        /foo/ -> foo/index.html        missing -> 404 listing what was tried
 Serves _site/ (run tools/stage.sh first, or use `make preview`, which stages then serves).
 Run: python3 tools/serve.py [port]   (default 8000)
@@ -30,4 +30,4 @@ if __name__ == "__main__":
     if not SITE.is_dir():
         sys.exit("_site/ missing — run tools/stage.sh first (or `make preview`).")
     with Server(("127.0.0.1", PORT), PagesHandler) as httpd:
-        print(f"3PT preview: http://127.0.0.1:{PORT}/  (serving {SITE})"); httpd.serve_forever()
+        print(f"Preview: http://127.0.0.1:{PORT}/  (serving {SITE})"); httpd.serve_forever()

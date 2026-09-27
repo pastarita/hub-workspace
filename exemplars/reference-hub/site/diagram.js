@@ -1,9 +1,9 @@
-/* 3PT · diagram.js — the mermaid reader and its typesetting system.
+/* hub-workspace reference · diagram.js — the mermaid reader and its typesetting system.
  *
  * WHY NOT MERMAID. The diagrams in docs/ are authored by us in a small, closed subset. Vendoring the
  * upstream renderer would buy generality we never use and cost the one thing we need: control of the
- * typesetting. This reads that subset and renders SVG in the hub's own tokens (3pt.css), so a diagram
- * and the leaf around it read as one object. Colours come from the class NAME (:::plan → --plan),
+ * typesetting. This reads that subset and renders SVG in the hub's own tokens (hub.css), so a diagram
+ * and the leaf around it read as one object. Colours come from the class NAME (:::hub → --c-orient),
  * never from the hex in classDef — tokens have one source. Flow kind is LINE STYLE, never colour.
  *
  * GRAMMAR READ (everything docs/ emits today, and nothing else)
@@ -24,7 +24,7 @@
  * LONG CHAINS WRAP SERPENTINE (boustrophedon): even rows L→R, odd rows R→L, so the row hop is a short
  * vertical drop and the chain stays legible on paper.
  *
- * Pure string building, no DOM, no dependency. Node-safe: exports globalThis.TPTDIAGRAM.
+ * Pure string building, no DOM, no dependency. Node-safe: exports globalThis.HUBDIAGRAM.
  */
 (function () {
   'use strict';
@@ -43,24 +43,23 @@
     line: 'var(--soft)', panel: 'var(--panel)', card: 'var(--card)',
     /* node roles — by class NAME. fill mixes the role hue into the card. */
     role: {
-      plan:       { stroke: 'var(--plan)',        mix: 22 },
-      build:      { stroke: 'var(--build)',       mix: 22 },
-      inst:       { stroke: 'var(--instrument)',  mix: 22 },
-      instrument: { stroke: 'var(--instrument)',  mix: 22 },
-      atlas:      { stroke: 'var(--cyan)',        mix: 22 },
-      surface:    { stroke: 'var(--slate)',       mix: 30 },
-      battery:    { stroke: 'var(--soft)',        mix: 12 },
-      data:       { stroke: 'var(--faint)',       mix: 8,  ink: 'var(--soft)' },
-      flag:       { stroke: 'var(--flag)',        mix: 22 },
-      ours:       { stroke: 'var(--flag)',        mix: 22 },
-      strands:    { stroke: 'var(--slate)',       mix: 30 },
+      /* the pattern's own vocabulary: a diagram about a hub colours its parts the way the hub does */
+      hub:        { stroke: 'var(--c-orient)',    mix: 14 },
+      leaf:       { stroke: 'var(--c-reference)', mix: 14 },
+      model:      { stroke: 'var(--c-demo)',      mix: 14 },
+      gate:       { stroke: 'var(--alert)',       mix: 10 },
+      rails:      { stroke: 'var(--c-record)',    mix: 14 },
+      surface:    { stroke: 'var(--c-record)',    mix: 18 },
+      store:      { stroke: 'var(--soft)',        mix: 8 },
+      data:       { stroke: 'var(--faint)',       mix: 6,  ink: 'var(--soft)' },
+      flag:       { stroke: 'var(--flag)',        mix: 14 },
       _:          { stroke: 'var(--line-strong)', mix: 0 }
     },
     /* edge kinds — meaning by line style */
     edge: { solid: { dash: '', w: 1.5 }, dotted: { dash: '4 4', w: 1.5 }, thick: { dash: '', w: 3 } },
     cluster: { stroke: 'var(--line)', dash: '5 4', fill: 'color-mix(in srgb, var(--panel) 55%, transparent)' },
     seq: { colW: 150, rowH: 30, headH: 34, frameInset: 10, selfW: 34 },
-    git: { stepX: 118, laneH: 52, r: 7, lanes: ['var(--build)', 'var(--instrument)', 'var(--plan)', 'var(--cyan)'] }
+    git: { stepX: 118, laneH: 52, r: 7, lanes: ['var(--c-orient)', 'var(--c-reference)', 'var(--c-demo)', 'var(--c-record)'] }
   };
 
   /* ================================================================ */
@@ -88,9 +87,9 @@
     return '<rect x="' + (x - w / 2) + '" y="' + (y - h / 2) + '" width="' + w + '" height="' + h + '" rx="4" fill="' + STYLE.panel + '" stroke="var(--line)"/>' + text(x, y, [s], { fs: STYLE.edgeFs, ink: ink || STYLE.muted });
   };
   var open = function (w, h, cls) {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" class="tpt-diagram ' + (cls || '') + '" font-family="' + STYLE.font + '">'
-      + '<defs><marker id="tpt-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="' + STYLE.line + '"/></marker>'
-      + '<marker id="tpt-tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11 Z" fill="' + STYLE.panel + '" stroke="' + STYLE.line + '" stroke-width="1.2"/></marker></defs>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" class="hub-diagram ' + (cls || '') + '" font-family="' + STYLE.font + '">'
+      + '<defs><marker id="hub-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="' + STYLE.line + '"/></marker>'
+      + '<marker id="hub-tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11 Z" fill="' + STYLE.panel + '" stroke="' + STYLE.line + '" stroke-width="1.2"/></marker></defs>';
   };
 
   /* ================================================================ */
@@ -303,7 +302,7 @@
       var k = STYLE.edge[e.kind], d, mx, my;
       if (e.from === e.to) { var r = 18; d = 'M' + (a.x + a.w / 2 - 10) + ' ' + (a.y - a.h / 2) + ' c 0 -' + r + ' ' + (r + 10) + ' -' + r + ' ' + (r + 10) + ' 0 c 0 ' + (r / 2) + ' -' + r + ' ' + (r / 2) + ' -' + r + ' 0'; mx = a.x + a.w / 2 + 6; my = a.y - a.h / 2 - r - 4; }
       else { var p = edgePath(a, b, L.horiz, L.serpentine); d = p.d; mx = p.mx; my = p.my; }
-      var head = e.head === 'tri' ? 'url(#tpt-tri)' : 'url(#tpt-arrow)';
+      var head = e.head === 'tri' ? 'url(#hub-tri)' : 'url(#hub-arrow)';
       out.push('<path d="' + d + '" fill="none" stroke="' + STYLE.line + '" stroke-width="' + k.w + '"' + (k.dash ? ' stroke-dasharray="' + k.dash + '"' : '') + (e.arrow ? ' marker-end="' + head + '"' : '') + (e.bidir ? ' marker-start="' + head + '"' : '') + '/>');
       if (e.label && showLabel[i] !== false) {
         var lw = tw(e.label, STYLE.edgeFs) + 10;                                   /* keep the pill on the canvas */
@@ -359,11 +358,11 @@
         }
         var a = g.pindex[it.from], b = g.pindex[it.to], num = g.auto ? (++n) + '. ' : '', lab = num + it.text, dash = it.dashed ? ' stroke-dasharray="4 4"' : '';
         if (a === b) {
-          body.push('<path d="M' + a.x + ' ' + y + ' h' + S.selfW + ' v' + (S.rowH * 0.6) + ' h-' + S.selfW + '" fill="none" stroke="' + STYLE.line + '" stroke-width="1.5"' + dash + (it.arrow ? ' marker-end="url(#tpt-arrow)"' : '') + '/>');
+          body.push('<path d="M' + a.x + ' ' + y + ' h' + S.selfW + ' v' + (S.rowH * 0.6) + ' h-' + S.selfW + '" fill="none" stroke="' + STYLE.line + '" stroke-width="1.5"' + dash + (it.arrow ? ' marker-end="url(#hub-arrow)"' : '') + '/>');
           body.push(text(a.x + S.selfW + 8, y + S.rowH * 0.3, [lab], { fs: STYLE.edgeFs, anchor: 'start', ink: STYLE.ink }));
           y += S.rowH * 0.6 + 14; return;
         }
-        body.push('<path d="M' + a.x + ' ' + y + ' L' + b.x + ' ' + y + '" fill="none" stroke="' + STYLE.line + '" stroke-width="1.5"' + dash + (it.arrow ? ' marker-end="url(#tpt-arrow)"' : '') + '/>');
+        body.push('<path d="M' + a.x + ' ' + y + ' L' + b.x + ' ' + y + '" fill="none" stroke="' + STYLE.line + '" stroke-width="1.5"' + dash + (it.arrow ? ' marker-end="url(#hub-arrow)"' : '') + '/>');
         body.push(text((a.x + b.x) / 2, y - 9, [lab], { fs: STYLE.edgeFs, ink: STYLE.ink }));
         y += S.rowH;
       });
@@ -378,7 +377,7 @@
       out.push('<rect x="' + ins + '" y="' + fr.y0 + '" width="' + (tw(ttl, STYLE.titleFs) + 16) + '" height="18" rx="4" fill="' + STYLE.panel + '" stroke="var(--line-strong)"/>' + text(ins + 8, fr.y0 + 9, [ttl], { fs: STYLE.titleFs, anchor: 'start', ink: STYLE.muted, weight: 700 }));
     });
     out.push(body.join(''));
-    g.parts.forEach(function (p) { out.push('<rect x="' + (p.x - p.w / 2) + '" y="' + STYLE.gap.pad + '" width="' + p.w + '" height="' + S.headH + '" rx="7" fill="' + fill(STYLE.role.surface) + '" stroke="var(--slate)" stroke-width="1.5"/>' + text(p.x, STYLE.gap.pad + S.headH / 2, [p.label], { weight: 600 })); });
+    g.parts.forEach(function (p) { out.push('<rect x="' + (p.x - p.w / 2) + '" y="' + STYLE.gap.pad + '" width="' + p.w + '" height="' + S.headH + '" rx="7" fill="' + fill(STYLE.role.surface) + '" stroke="var(--c-record)" stroke-width="1.5"/>' + text(p.x, STYLE.gap.pad + S.headH / 2, [p.label], { weight: 600 })); });
     out.push('</svg>');
     return out.join('');
   }
@@ -415,7 +414,7 @@
       else out.push('<circle cx="' + c.x + '" cy="' + c.y + '" r="' + S.r + '" fill="' + c.color + '"/>');
       var ls = wrap(c.id.split(' · '), 18), below = (i % 2 === 0) || c.lane !== 'main';
       out.push(text(c.x, c.y + (below ? 16 + (ls.length * STYLE.lead) / 2 : -14 - (ls.length * STYLE.lead) / 2), ls, { fs: STYLE.edgeFs, ink: STYLE.muted }));
-      if (c.tag) { var w = tw(c.tag, STYLE.edgeFs) + 12; var ty = below ? c.y - 20 : c.y + 20; out.push('<rect x="' + (c.x - w / 2) + '" y="' + (ty - 9) + '" width="' + w + '" height="18" rx="9" fill="' + fill(STYLE.role.inst) + '" stroke="var(--instrument)"/>' + text(c.x, ty, [c.tag], { fs: STYLE.edgeFs, ink: STYLE.ink, weight: 600 })); }
+      if (c.tag) { var w = tw(c.tag, STYLE.edgeFs) + 12; var ty = below ? c.y - 20 : c.y + 20; out.push('<rect x="' + (c.x - w / 2) + '" y="' + (ty - 9) + '" width="' + w + '" height="18" rx="9" fill="' + fill(STYLE.role.leaf) + '" stroke="var(--c-reference)"/>' + text(c.x, ty, [c.tag], { fs: STYLE.edgeFs, ink: STYLE.ink, weight: 600 })); }
     });
     out.push('</svg>');
     return out.join('');
@@ -477,5 +476,5 @@
   }
   function layout(g) { return g.type === 'flow' ? layoutFlow(g) : null; }
   function render(src) { var g = typeof src === 'string' ? parse(src) : src; return g.type === 'flow' ? renderFlow(g) : g.type === 'seq' ? renderSeq(g) : renderGit(g); }
-  G.TPTDIAGRAM = { parse: parse, layout: layout, render: render, STYLE: STYLE };
+  G.HUBDIAGRAM = { parse: parse, layout: layout, render: render, STYLE: STYLE };
 })();

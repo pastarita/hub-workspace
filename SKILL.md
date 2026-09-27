@@ -9,7 +9,7 @@ description: >
   agent-editable site with preview deploys behind a login, make a call sheet / dashboard /
   gantt / one-pager / deck family that shares a design system, codify "the sidebar hub
   pattern", or build an "estate" / multi-hub navigator that lets several existing hubs reach
-  each other. Working exemplar in this repo: exemplars/3pt-hub (Shell, Model, Viewer, diagram
+  each other. Working exemplar in this repo: exemplars/reference-hub (Shell, Model, Viewer, diagram
   reader, two-door Access gate, three lints, Pages-faithful preview, CI).
 ---
 
@@ -262,7 +262,7 @@ is the correct move when its inputs do not exist yet; say so on the hub card.
   asserting no NaN geometry, no unresolved edge endpoints, and no source markup leaking into
   output.
   Exemplar, covering the wider grammar docs need when they hand-author mermaid:
-  `exemplars/3pt-hub/site/diagram.js` — flowchart in four directions with nested
+  `exemplars/reference-hub/site/diagram.js` — flowchart in four directions with nested
   subgraphs, cluster endpoints, six node shapes, five edge styles, fan-out, bidirectional edges,
   self-loops, plus sequenceDiagram, gitGraph, stateDiagram-v2 and classDiagram, all in one
   node-safe file; the Viewer hands every ```mermaid fence to it and a fence it cannot parse
@@ -374,7 +374,7 @@ download is not a destination) · an HTML proposal saved under `docs/` (a leaf t
 highlight, no lint sweep, broken relative links — it belongs in `site/`) · a markdown link that
 resolves from the site root when the Viewer resolves from the document's directory (lint every
 relative link from `dirname(doc)`, and make generators emit them that way) · a leaf that loads
-web fonts from a CDN (vendor the latin subsets; `exemplars/3pt-hub/tools/vendor-fonts.sh`) · a one-way hub (leaves that link the tokens file but never
+web fonts from a CDN (vendor the latin subsets; `exemplars/reference-hub/tools/vendor-fonts.sh`) · a one-way hub (leaves that link the tokens file but never
 link back) · a DERIVED badge on a number nobody recomputed · shipping a correction pass
 unverified · a workspace with no `git init` — with several agents writing, an unattributable
 file is a permanent mystery · a changelog with no "what did not move" section · a dated

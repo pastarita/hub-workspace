@@ -1,22 +1,26 @@
-# 3PT · hub workspace CI/CD (Cloudflare Pages). Scoped to hub/ and the docs it renders.
+# hub-workspace reference · CI/CD (Cloudflare Pages).
 #
-# push to main  → stage + lints → production deploy  (https://3pt.pages.dev, gated)
-# pull request  → stage + lints → preview deploy at https://<branch>.3pt.pages.dev
+# TEMPLATE: GitHub only runs workflows from the repository root's .github/workflows/. Copy this
+# file there in a real hub and set WORKDIR to the hub's directory ('.' when the hub is the repo).
+#
+# push to main  → stage + lints → production deploy  (https://<project>.pages.dev, gated)
+# pull request  → stage + lints → preview deploy at https://<branch>.<project>.pages.dev
 #                 + one sticky PR comment with the URL, so the other principal reviews in the browser.
 #
 # Deploy steps no-op with a notice until the two repository secrets exist:
 #   gh secret set CLOUDFLARE_API_TOKEN   (token scope: Cloudflare Pages: Edit)
 #   gh secret set CLOUDFLARE_ACCOUNT_ID  (from `npx wrangler whoami`)
-# wrangler runs from hub/ so hub/functions/_middleware.js (the gate) is compiled.
+# wrangler runs from the hub directory so functions/_middleware.js (the gate) is compiled.
 name: Deploy hub to Cloudflare Pages
 
 on:
   push:
     branches: [main]
-    paths: ['hub/**', 'docs/**', 'README.md', 'brainstorming.md', '.github/workflows/deploy.yml']
-  pull_request:
-    paths: ['hub/**', 'docs/**', 'README.md', 'brainstorming.md', '.github/workflows/deploy.yml']
+  pull_request: {}
   workflow_dispatch: {}
+
+env:
+  WORKDIR: exemplars/reference-hub
 
 concurrency:
   group: pages-deploy-${{ github.ref }}
@@ -29,7 +33,7 @@ permissions:
 
 defaults:
   run:
-    working-directory: hub
+    working-directory: exemplars/reference-hub   # keep equal to WORKDIR (contexts are not allowed here)
 
 jobs:
   check:
@@ -42,8 +46,7 @@ jobs:
       - run: bash tools/stage.sh
       - run: node tools/check-nav.mjs
       - run: node tools/check-view.mjs
-      - run: node ../scripts/prov.mjs --check
-      - run: node tools/tersity.mjs --check
+      - run: node tools/check-diagram.mjs
 
   deploy:
     name: Deploy
@@ -60,7 +63,7 @@ jobs:
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           if [ -n "$CF_TOKEN" ] && [ -n "$CF_ACCOUNT" ]; then echo "ok=true" >> "$GITHUB_OUTPUT";
-          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::notice::Cloudflare secrets not set — deploy skipped (deploy by hand: make -C hub deploy)"; fi
+          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::notice::Cloudflare secrets not set — deploy skipped (deploy by hand: make deploy)"; fi
       - name: Deploy to Pages
         id: deploy
         if: steps.creds.outputs.ok == 'true'
@@ -68,9 +71,9 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: hub
+          workingDirectory: ${{ env.WORKDIR }}
           # PRs deploy to a preview URL; main deploys production. One expression, both environments.
-          command: pages deploy _site --project-name=3pt --branch=${{ github.head_ref || 'main' }}
+          command: pages deploy _site --project-name=hub-workspace --branch=${{ github.head_ref || 'main' }}
       - name: Comment preview on PR
         if: steps.creds.outputs.ok == 'true' && github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -79,12 +82,12 @@ jobs:
           ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
         with:
           script: |
-            const marker = '<!-- 3pt-preview -->';
-            const body = [marker, '## 3PT hub preview', '', '| | |', '|---|---|',
+            const marker = '<!-- hub-preview -->';
+            const body = [marker, '## Hub preview', '', '| | |', '|---|---|',
               `| Preview | ${process.env.DEPLOY_URL} |`,
               `| Branch alias | ${process.env.ALIAS_URL || '—'} |`,
               `| Commit | \`${context.payload.pull_request.head.sha.slice(0, 7)}\` |`, '',
-              '_Gated at the edge — sign in with your allowlisted address and the team password._'].join('\n');
+              '_Gated at the edge — sign in through Cloudflare Access (one-time PIN)._'].join('\n');
             const { data: comments } = await github.rest.issues.listComments({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, per_page: 100 });
             const existing = comments.find(c => c.body && c.body.startsWith(marker));
             if (existing) await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });

@@ -29,7 +29,7 @@ flush one `<p>` on a blank line or block start; append an indented non-block lin
 open `<li>`. Add to the regression checks:
 `md('line one\nline two')` must contain exactly one `<p>`, and
 `md('- a\n  continues')` must contain `<li>a continues</li>`. Worked fix:
-`exemplars/3pt-hub/site/view-render.js` (renderers split into their own node-safe file so
+`exemplars/reference-hub/site/view-render.js` (renderers split into their own node-safe file so
 `tools/check-view.mjs` tests the shipped code).
 
 **Sentinel note for model-authored files:** writing `'\u0000F'` as an escape is correct in
