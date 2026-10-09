@@ -51,6 +51,7 @@ points to.
 | `references/derived-layer.md` | Authored model, generated derived file, generator and verifier: how numbers stay true. |
 | `references/symbolic-system.md` | Register, cluster registry, glyph minting, status glyphs, stable handles. |
 | `references/estate.md` | The tier above one hub: federated and layered estates. |
+| `references/app-tier.md` | **Optional.** The App tier: Next.js via vinext on Cloudflare Workers, Access at the edge plus an in-app role check, private documents served from R2. When to use: a second audience must see less than the first (role-filtered pages, documents, files), or people need shared, attributed writes that differ by role. Otherwise stay flat. |
 | `reviews/` | Dated audits of real builds against the pattern. |
 | `exemplars/reference-hub/` | A complete working instance with its own paper-base design system: Shell, tokens, Viewer, the mermaid reader (`site/diagram.js`), the two-door gate (`functions/_middleware.js`), the lints, stage and preview scripts, the Access setup script, and the CI workflow. |
 

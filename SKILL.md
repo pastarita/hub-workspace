@@ -75,7 +75,9 @@ local, main is live, everything behind a gate).
   sits behind it. The old Tier 0 (Basic auth alone) is no longer a starting state; it is only
   ever the second door. Tier 2 (self-service request-and-approve over KV) is the graduation the
   first time someone outside the policy needs in without you editing it; it runs beside Access,
-  never instead. No `DISABLE_GATE`, ever. See `references/collaborator-access.md`.
+  never instead. No `DISABLE_GATE`, ever. See `references/collaborator-access.md`. Roles, where
+  some principals must see *less*, are not a fourth rung: they are the optional App tier,
+  `references/app-tier.md`.
 - **Rails** — CI (`.github/workflows/deploy.yml`): deploy `site/` (or repo root) to Cloudflare
   Pages on merge to main; **preview URL per PR**. "The hub is the deploy: if it's on main,
   it's live."
@@ -358,6 +360,11 @@ hand-authored `index.html` placed inside one.
 Stay flat until: a third surface needs server state, or the first non-trivial write API —
 then add a Worker + DO/D1 *as another reader/writer of the same keys*. Never introduce a
 bundler/framework for layout reasons; the pattern's value is that agents edit whole files.
+
+**Optional:** the one framework graduation that pays is for *authorization*, not layout — a
+second audience that must see less, or shared, attributed writes that differ by role. That is the
+App tier (Next.js via vinext on Workers, Access at the edge, a role check on every request):
+`references/app-tier.md`. Flat stays the default.
 
 ## Anti-patterns
 
